@@ -7,7 +7,7 @@ export function ProductsPage() {
     <div className="p-4 xl:px-0">
       <ProductsPageHeading />
       <div className="flex items-start gap-2">
-        <span className="hidden lg:block">
+        <span className="hidden lg:block max-h-[90vh] overflow-y-auto sticky top-16 left-0">
           <FilterOptionsBox />
         </span>
         <ProductListings />
