@@ -26,35 +26,39 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import { createProduct } from "../actions";
+import { updateProduct } from "../actions";
 import { addProductSchema } from "../schemas";
-import { useRouter } from "next/navigation";
+import { ProductType } from "../types";
 
-export function AddProductForm() {
-  const router = useRouter();
+export function UpdateProductForm({
+  info: { id, name, description },
+  onSuccess,
+}: {
+  info: ProductType;
+  onSuccess?: () => void;
+}) {
   const form = useForm({
     defaultValues: {
-      name: "",
+      name,
       description: "This is the description which is given by me",
     },
     validators: {
       onSubmit: addProductSchema,
     },
     onSubmit: async ({ value }) => {
-      const res = await createProduct({ value });
+      const res = await updateProduct({ value, productId: id });
       if (res.error) {
         toast.error(res.error);
       }
       if (res.message) {
         toast.success(res.message);
-        form.reset();
-        router.refresh();
+        onSuccess && onSuccess();
       }
     },
   });
 
   return (
-    <Card className="w-full rounded-sm">
+    <Card className="w-full rounded-sm ">
       <CardHeader>
         <CardTitle>Product info</CardTitle>
         <CardDescription>Describe as much as you can.</CardDescription>
@@ -153,7 +157,7 @@ export function AddProductForm() {
                 type="submit"
                 form="add-product-form"
               >
-                Submit
+                Update
               </Button>
             </Field>
           )}
