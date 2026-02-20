@@ -14,41 +14,39 @@ import {
 } from "@/components/ui/card";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroupTextarea,
-} from "@/components/ui/input-group";
-import { createProduct } from "../actions";
-import { addProductSchema } from "../schemas";
-import { useRouter } from "next/navigation";
 
-export function AddProductForm() {
-  const router = useRouter();
+import { signUpSchema } from "../schemas";
+import { authClient } from "@/lib/auth-client";
+// import { signUpAction } from "../actions"; // ← you will add later
+
+export function SignUpForm() {
   const form = useForm({
     defaultValues: {
       name: "",
-      description: "",
+      email: "",
+      password: "",
     },
     validators: {
-      onSubmit: addProductSchema,
+      onSubmit: signUpSchema,
+      onChange: signUpSchema,
     },
     onSubmit: async ({ value }) => {
-      const res = await createProduct({ value });
-      if (res.error) {
-        toast.error(res.error);
-      }
-      if (res.message) {
-        toast.success(res.message);
+      try {
+        const res = await authClient.signUp.email(value);
+        if (res.data) {
+          toast.success("Signed up success");
+        }
+        if (res.error) {
+          toast.error(res.error.message || res.error.statusText);
+        }
         form.reset();
-        router.refresh();
+      } catch (err) {
+        toast.error("Something went wrong");
       }
     },
   });
@@ -56,23 +54,26 @@ export function AddProductForm() {
   return (
     <Card className="w-full rounded-sm">
       <CardHeader>
-        <CardTitle>Product info</CardTitle>
-        <CardDescription>Describe as much as you can.</CardDescription>
+        <CardTitle>Create account</CardTitle>
+        <CardDescription>Enter your information to sign up.</CardDescription>
       </CardHeader>
+
       <CardContent>
         <form
-          id="add-product-form"
+          id="signup-form"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
           }}
         >
           <FieldGroup>
+            {/* Name */}
             <form.Field
               name="name"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
+
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>Name</FieldLabel>
@@ -83,8 +84,7 @@ export function AddProductForm() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-                      placeholder="Enter full product name."
-                      autoComplete="off"
+                      autoComplete="name"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -93,36 +93,55 @@ export function AddProductForm() {
                 );
               }}
             />
+
+            {/* Email */}
             <form.Field
-              name="description"
+              name="email"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
+
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Description</FieldLabel>
-                    <InputGroup>
-                      <InputGroupTextarea
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="I'm having an issue with the login button on mobile."
-                        rows={6}
-                        className="min-h-24 resize-none"
-                        aria-invalid={isInvalid}
-                      />
-                      <InputGroupAddon align="block-end">
-                        <InputGroupText className="tabular-nums">
-                          {field.state.value.length}/100 characters
-                        </InputGroupText>
-                      </InputGroupAddon>
-                    </InputGroup>
-                    <FieldDescription>
-                      Include steps to reproduce, expected behavior, and what
-                      actually happened.
-                    </FieldDescription>
+                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type="email"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      autoComplete="email"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+
+            {/* Password */}
+            <form.Field
+              name="password"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type="password"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      autoComplete="new-password"
+                    />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
@@ -133,6 +152,7 @@ export function AddProductForm() {
           </FieldGroup>
         </form>
       </CardContent>
+
       <CardFooter>
         <form.Subscribe
           selector={(state) => [state.isSubmitting]}
@@ -148,12 +168,9 @@ export function AddProductForm() {
               >
                 Reset
               </Button>
-              <Button
-                disabled={isPending}
-                type="submit"
-                form="add-product-form"
-              >
-                Submit
+
+              <Button disabled={isPending} type="submit" form="signup-form">
+                Create account
               </Button>
             </Field>
           )}

@@ -14,41 +14,38 @@ import {
 } from "@/components/ui/card";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroupTextarea,
-} from "@/components/ui/input-group";
-import { createProduct } from "../actions";
-import { addProductSchema } from "../schemas";
-import { useRouter } from "next/navigation";
 
-export function AddProductForm() {
-  const router = useRouter();
+import { signInSchema } from "../schemas";
+import { authClient } from "@/lib/auth-client";
+// import { signInAction } from "../actions"; // ← you add later
+
+export function SignInForm() {
   const form = useForm({
     defaultValues: {
-      name: "",
-      description: "",
+      email: "",
+      password: "",
     },
     validators: {
-      onSubmit: addProductSchema,
+      onSubmit: signInSchema,
+      onChange: signInSchema,
     },
     onSubmit: async ({ value }) => {
-      const res = await createProduct({ value });
-      if (res.error) {
-        toast.error(res.error);
-      }
-      if (res.message) {
-        toast.success(res.message);
-        form.reset();
-        router.refresh();
+      try {
+        const res = await authClient.signIn.email(value);
+        if (res.data) {
+          toast.success("Signed in success");
+          form.reset();
+        }
+        if (res.error) {
+          toast.error(res.error.message || res.error.statusText);
+        }
+      } catch (err) {
+        toast.error("Something went wrong");
       }
     },
   });
@@ -56,35 +53,38 @@ export function AddProductForm() {
   return (
     <Card className="w-full rounded-sm">
       <CardHeader>
-        <CardTitle>Product info</CardTitle>
-        <CardDescription>Describe as much as you can.</CardDescription>
+        <CardTitle>Welcome back</CardTitle>
+        <CardDescription>Enter your credentials to sign in.</CardDescription>
       </CardHeader>
+
       <CardContent>
         <form
-          id="add-product-form"
+          id="signin-form"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
           }}
         >
           <FieldGroup>
+            {/* Email */}
             <form.Field
-              name="name"
+              name="email"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
+
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
                     <Input
                       id={field.name}
                       name={field.name}
+                      type="email"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-                      placeholder="Enter full product name."
-                      autoComplete="off"
+                      autoComplete="email"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -93,36 +93,27 @@ export function AddProductForm() {
                 );
               }}
             />
+
+            {/* Password */}
             <form.Field
-              name="description"
+              name="password"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
+
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Description</FieldLabel>
-                    <InputGroup>
-                      <InputGroupTextarea
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="I'm having an issue with the login button on mobile."
-                        rows={6}
-                        className="min-h-24 resize-none"
-                        aria-invalid={isInvalid}
-                      />
-                      <InputGroupAddon align="block-end">
-                        <InputGroupText className="tabular-nums">
-                          {field.state.value.length}/100 characters
-                        </InputGroupText>
-                      </InputGroupAddon>
-                    </InputGroup>
-                    <FieldDescription>
-                      Include steps to reproduce, expected behavior, and what
-                      actually happened.
-                    </FieldDescription>
+                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type="password"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      autoComplete="current-password"
+                    />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
@@ -133,6 +124,7 @@ export function AddProductForm() {
           </FieldGroup>
         </form>
       </CardContent>
+
       <CardFooter>
         <form.Subscribe
           selector={(state) => [state.isSubmitting]}
@@ -148,12 +140,9 @@ export function AddProductForm() {
               >
                 Reset
               </Button>
-              <Button
-                disabled={isPending}
-                type="submit"
-                form="add-product-form"
-              >
-                Submit
+
+              <Button disabled={isPending} type="submit" form="signin-form">
+                Sign in
               </Button>
             </Field>
           )}

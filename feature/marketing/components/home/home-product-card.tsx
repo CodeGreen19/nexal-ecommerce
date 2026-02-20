@@ -1,6 +1,9 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-export function HomeProductCard() {
+export function HomeProductCard({ id, name }: { name: string; id: string }) {
   return (
     <div className=" p-2 border rounded-2xl">
       <Image
@@ -9,6 +12,8 @@ export function HomeProductCard() {
         width={200}
         alt="product-cart"
       />
+      <h1>{name}</h1>
+      <Button onClick={() => {}}>Add to cart</Button>
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { integer, pgTable, text, varchar } from "drizzle-orm/pg-core";
-import { createdAt, updatedAt, id } from "../helpers";
+import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "../helpers";
 
 export const products = pgTable("products", {
   id,

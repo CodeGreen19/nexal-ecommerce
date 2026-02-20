@@ -1,16 +1,15 @@
 "use client";
 import { Logo } from "@/components/shared/logo";
 import {
-  MagnifyingGlassIcon,
-  UserIcon,
-  ShoppingCartIcon,
   ListIcon,
+  MagnifyingGlassIcon,
+  ShoppingCartIcon,
+  UserIcon,
 } from "@phosphor-icons/react";
-import { SearchDialog } from "../components/navbar/search-dialog";
-import { Button } from "@/components/ui/button";
-import { UserButton } from "../components/navbar/user-button";
 import { CartSheet } from "../components/navbar/cart-sheet";
 import { NavMenuMobile } from "../components/navbar/nav-menu-mobile";
+import { SearchDialog } from "../components/navbar/search-dialog";
+import { UserButton } from "../components/navbar/user-button";
 
 const items = [
   "New arrived",
