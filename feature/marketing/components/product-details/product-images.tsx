@@ -12,10 +12,8 @@ export function ProductImages() {
         />
       </div>
       <div className="flex items-center justify-start gap-2 overflow-x-auto py-3 pl-3 lg:pl-0">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div className="size-20 flex-none bg-muted rounded-xl" key={i}>
-            {i}
-          </div>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div className="size-20 flex-none bg-muted rounded-xl" key={i}></div>
         ))}
       </div>
     </div>

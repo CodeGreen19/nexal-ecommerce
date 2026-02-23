@@ -21,7 +21,7 @@ export function AdminSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="pl-4 h-16 flex items-start justify-start">
-        <Logo href="/admin/dashboard" />
+        <Logo href="/admin/home/dashboard" />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

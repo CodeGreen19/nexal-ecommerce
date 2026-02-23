@@ -29,6 +29,14 @@ export function ProductTable({
       header: "Descriptions",
     },
     {
+      accessorKey: "price",
+      header: "Price",
+    },
+    {
+      accessorKey: "stock",
+      header: "Stock",
+    },
+    {
       id: "actions",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">

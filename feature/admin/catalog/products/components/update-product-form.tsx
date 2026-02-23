@@ -27,26 +27,30 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { updateProduct } from "../actions";
-import { addProductSchema } from "../schemas";
+import { addProductSchema, AddProductSchemaType } from "../schemas";
 import { ProductType } from "../types";
 
 export function UpdateProductForm({
-  info: { id, name, description },
+  info,
   onSuccess,
 }: {
   info: ProductType;
   onSuccess?: () => void;
 }) {
+  const defaultValues: AddProductSchemaType = {
+    name: info.name,
+    description: info.description,
+    price: info.price,
+    stock: info.stock,
+  };
   const form = useForm({
-    defaultValues: {
-      name,
-      description: "This is the description which is given by me",
-    },
+    defaultValues: defaultValues,
     validators: {
       onSubmit: addProductSchema,
     },
+
     onSubmit: async ({ value }) => {
-      const res = await updateProduct({ value, productId: id });
+      const res = await updateProduct({ value, productId: info.id });
       if (res.error) {
         toast.error(res.error);
       }
@@ -58,14 +62,14 @@ export function UpdateProductForm({
   });
 
   return (
-    <Card className="w-full rounded-sm ">
+    <Card className="w-full rounded-sm">
       <CardHeader>
         <CardTitle>Product info</CardTitle>
         <CardDescription>Describe as much as you can.</CardDescription>
       </CardHeader>
       <CardContent>
         <form
-          id="add-product-form"
+          id="update-product-form"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
@@ -134,6 +138,61 @@ export function UpdateProductForm({
                 );
               }}
             />
+            <form.Field
+              name="price"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Price</FieldLabel>
+
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) =>
+                        field.handleChange(Number(e.target.value))
+                      }
+                      placeholder="Enter my price"
+                      aria-invalid={isInvalid}
+                    />
+
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+            <form.Field
+              name="stock"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Stock</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) =>
+                        field.handleChange(Number(e.target.value))
+                      }
+                      placeholder="Enter my stock"
+                      aria-invalid={isInvalid}
+                    />
+
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
           </FieldGroup>
         </form>
       </CardContent>
@@ -155,7 +214,7 @@ export function UpdateProductForm({
               <Button
                 disabled={isPending}
                 type="submit"
-                form="add-product-form"
+                form="update-product-form"
               >
                 Update
               </Button>

@@ -26,7 +26,7 @@ export function UserButton(props: { children: ReactNode }) {
     return <CircleNotchIcon className="size-6 animate-spin" />;
   }
   if (error) {
-    return <div>Error</div>;
+    return <div>Auth Error {error.message}</div>;
   }
 
   return isSignedUp ? (
@@ -47,8 +47,13 @@ function SignedUpDropdown({ children }: { children: ReactNode }) {
           <Link href={"/account/profile"}>
             <DropdownMenuItem>Profile</DropdownMenuItem>
           </Link>
-          <DropdownMenuItem>Orders</DropdownMenuItem>
-          <DropdownMenuItem>Wishlists</DropdownMenuItem>
+          <Link href={"/account/orders"}>
+            <DropdownMenuItem>Orders</DropdownMenuItem>
+          </Link>
+          <Link href={"/account/wishlists"}>
+            <DropdownMenuItem>Wishlists</DropdownMenuItem>
+          </Link>
+
           <DropdownMenuItem
             disabled={isPending}
             onClick={() => {

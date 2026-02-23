@@ -27,16 +27,20 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { createProduct } from "../actions";
-import { addProductSchema } from "../schemas";
+import { addProductSchema, AddProductSchemaType } from "../schemas";
 import { useRouter } from "next/navigation";
 
 export function AddProductForm() {
   const router = useRouter();
+
+  const defaultValues: AddProductSchemaType = {
+    name: "",
+    description: "",
+    price: 0,
+    stock: 0,
+  };
   const form = useForm({
-    defaultValues: {
-      name: "",
-      description: "",
-    },
+    defaultValues: defaultValues,
     validators: {
       onSubmit: addProductSchema,
     },
@@ -123,6 +127,61 @@ export function AddProductForm() {
                       Include steps to reproduce, expected behavior, and what
                       actually happened.
                     </FieldDescription>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+            <form.Field
+              name="price"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Price</FieldLabel>
+
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) =>
+                        field.handleChange(Number(e.target.value))
+                      }
+                      placeholder="Enter my price"
+                      aria-invalid={isInvalid}
+                    />
+
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+            <form.Field
+              name="stock"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Stock</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) =>
+                        field.handleChange(Number(e.target.value))
+                      }
+                      placeholder="Enter my stock"
+                      aria-invalid={isInvalid}
+                    />
+
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}

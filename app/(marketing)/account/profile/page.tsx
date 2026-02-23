@@ -1,5 +1,5 @@
-import { ProfilePage } from "@/feature/marketing/pages/profile-page";
+import { AccountProfilePage } from "@/feature/marketing/pages/account-profile-page";
 
 export default function page() {
-  return <ProfilePage />;
+  return <AccountProfilePage />;
 }
