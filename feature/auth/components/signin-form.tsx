@@ -37,6 +37,7 @@ export function SignInForm() {
     onSubmit: async ({ value }) => {
       try {
         const res = await authClient.signIn.email(value);
+
         if (res.data) {
           toast.success("Signed in success");
           form.reset();

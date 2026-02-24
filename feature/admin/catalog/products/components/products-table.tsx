@@ -4,14 +4,23 @@ import { DataTable } from "@/feature/admin/shared-components/table/data-table";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { PenIcon, TrashIcon } from "@phosphor-icons/react";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { showToast } from "@/helpers/ui/show-toast";
+import { CloudWarningIcon, PenIcon, TrashIcon } from "@phosphor-icons/react";
 import { ColumnDef } from "@tanstack/react-table";
-import { use, useState, useTransition } from "react";
-import { ProductType } from "../types";
-import { UpdateProductForm } from "./update-product-form";
-import { deleteProduct } from "../actions";
-import { toast } from "sonner";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { use, useState, useTransition } from "react";
+import { deleteProduct } from "../actions";
+import { ProductType } from "../types";
+import { ProductForm } from "./product-form";
 
 export function ProductTable({
   products,
@@ -28,18 +37,11 @@ export function ProductTable({
       accessorKey: "description",
       header: "Descriptions",
     },
-    {
-      accessorKey: "price",
-      header: "Price",
-    },
-    {
-      accessorKey: "stock",
-      header: "Stock",
-    },
+
     {
       id: "actions",
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center place-self-end  w-fit gap-2">
           <UpdateButton info={row.original} />
           <DeleteButton productId={row.original.id} />
         </div>
@@ -50,11 +52,30 @@ export function ProductTable({
   return (
     <div>
       {allProducts.length === 0 ? (
-        <div>No Products</div>
+        <EmptyProduct />
       ) : (
         <DataTable columns={columns} data={allProducts} />
       )}
     </div>
+  );
+}
+
+function EmptyProduct() {
+  return (
+    <Empty className="border border-dashed">
+      <EmptyHeader>
+        <EmptyMedia variant={"icon"}>
+          <CloudWarningIcon />
+        </EmptyMedia>
+        <EmptyTitle>No Products</EmptyTitle>
+        <EmptyDescription>Add your first product now.</EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Link href={"/admin/catalog/products/add-new"}>
+          <Button>Add First Product</Button>
+        </Link>
+      </EmptyContent>
+    </Empty>
   );
 }
 
@@ -72,11 +93,12 @@ function UpdateButton({ info }: { info: ProductType }) {
           }
         />
         <DialogContent>
-          <UpdateProductForm
-            info={info}
+          <ProductForm
+            type="update"
+            existedValues={info}
             onSuccess={() => {
-              setOpen(false);
               router.refresh();
+              setOpen(false);
             }}
           />
         </DialogContent>
@@ -94,7 +116,7 @@ function DeleteButton({ productId }: { productId: string }) {
         onClick={() => {
           startTransition(async () => {
             const res = await deleteProduct({ productId });
-            toast.success(res.message);
+            showToast(res);
             router.refresh();
           });
         }}

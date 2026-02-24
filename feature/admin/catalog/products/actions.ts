@@ -2,43 +2,74 @@
 
 import { db } from "@/drizzle/db";
 import { products } from "@/drizzle/schema";
+import {
+  customError,
+  customSuccess,
+  MutationResult,
+} from "@/helpers/db/return";
+import { generateUniqueSlug } from "@/helpers/db/unique-slug";
 import { eq } from "drizzle-orm";
 import { revalidateTag } from "next/cache";
-import { addProductSchema, AddProductSchemaType } from "./schemas";
+import { productSchema, ProductSchemaType } from "./schemas";
 
-export async function createProduct({
+export async function addProduct({
   value,
 }: {
-  value: AddProductSchemaType;
-}) {
-  const { success, data } = addProductSchema.safeParse(value);
+  value: ProductSchemaType;
+}): Promise<MutationResult> {
+  const { success, data } = productSchema.safeParse(value);
   if (!success) {
-    return { error: "Invalid data !" };
+    return customError();
   }
-  await db.insert(products).values(data);
+  const slug = await generateUniqueSlug(products.slug, data.name);
+  await db.insert(products).values({ ...data, slug });
   revalidateTag("products", "max");
-  return { message: "New proudct added" };
+  return customSuccess();
 }
 
-//---------------------------------update product----------------------------------//
+// -------------------------------------------------------------//
 export async function updateProduct({
   value,
   productId,
 }: {
-  value: AddProductSchemaType;
+  value: ProductSchemaType;
   productId: string;
-}) {
-  const { success, data } = addProductSchema.safeParse(value);
+}): Promise<MutationResult> {
+  const { success, data } = productSchema.safeParse(value);
   if (!success) {
-    return { error: "Invalid data !" };
+    return customError("Invalid Data");
   }
-  await db.update(products).set(data).where(eq(products.id, productId));
+
+  // update slug
+  const [product] = await db
+    .select()
+    .from(products)
+    .where(eq(products.id, productId));
+
+  if (!product) {
+    return customError("product not found");
+  }
+
+  let slug = undefined;
+  if (product.name !== data.name) {
+    const newSlug = await generateUniqueSlug(products.slug, data.name);
+    slug = newSlug;
+  }
+
+  await db
+    .update(products)
+    .set({ ...data, slug })
+    .where(eq(products.id, productId));
   revalidateTag("products", "max");
-  return { message: "Updated proudct added" };
+  return customSuccess("Product Updated");
 }
-//---------------------------------delete product----------------------------------//
-export async function deleteProduct({ productId }: { productId: string }) {
+//-------------------------------------------------------------//
+export async function deleteProduct({
+  productId,
+}: {
+  productId: string;
+}): Promise<MutationResult> {
   await db.delete(products).where(eq(products.id, productId));
   revalidateTag("products", "max");
-  return { message: " Proudct deleted" };
+  return customSuccess(" Proudct deleted");
 }
