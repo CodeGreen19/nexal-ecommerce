@@ -2,7 +2,13 @@ import { Button } from "../ui/button";
 import { Field } from "../ui/field";
 import { useFormContext } from "./form-context";
 
-export function SubscribeButton({ type }: { type: "add" | "update" }) {
+export function SubscribeButton({
+  type,
+  formId,
+}: {
+  type: "add" | "update";
+  formId: string;
+}) {
   const form = useFormContext();
   return (
     <form.Subscribe
@@ -19,11 +25,7 @@ export function SubscribeButton({ type }: { type: "add" | "update" }) {
           >
             Reset
           </Button>
-          <Button
-            disabled={isPending}
-            type="submit"
-            form={`product-form-${type}`}
-          >
+          <Button disabled={isPending} type="submit" form={formId}>
             {type === "update" ? "Update" : "Submit"}
           </Button>
         </Field>
