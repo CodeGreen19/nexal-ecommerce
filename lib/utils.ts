@@ -5,6 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export async function waitInSecond(milliSeconds?: number) {
+export async function waitInMiliseconds(milliSeconds?: number) {
   return new Promise((res) => setTimeout(res, milliSeconds || 1000));
 }

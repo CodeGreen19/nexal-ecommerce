@@ -7,7 +7,7 @@ import { and, desc, eq } from "drizzle-orm";
 
 type AddToCartType = {
   productId: string;
-  price: number;
+  price: 5;
   quantity: number;
 };
 export async function addToCart({ productId, quantity, price }: AddToCartType) {
@@ -90,7 +90,7 @@ export async function getCart() {
       product: {
         id: products.id,
         name: products.name,
-        price: products.price,
+        price: products.name,
       },
     })
     .from(cartItems)

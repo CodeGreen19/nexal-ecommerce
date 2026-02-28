@@ -3,7 +3,6 @@
 import { DataTable } from "@/feature/admin/shared-components/table/data-table";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
   Empty,
   EmptyContent,
@@ -12,15 +11,13 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { showToast } from "@/helpers/ui/show-toast";
-import { CloudWarningIcon, PenIcon, TrashIcon } from "@phosphor-icons/react";
+import { CloudWarningIcon } from "@phosphor-icons/react";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { use, useState, useTransition } from "react";
-import { deleteProduct } from "../actions";
+import { use } from "react";
 import { ProductType } from "../types";
-import { ProductForm } from "./product-form";
+import { DeleteProductDialog } from "./delete-product-dialog";
+import { UpdateProductDialog } from "./update-product-dialog";
 
 export function ProductTable({
   products,
@@ -28,6 +25,7 @@ export function ProductTable({
   products: Promise<ProductType[]>;
 }) {
   const allProducts = use(products);
+
   const columns: ColumnDef<ProductType>[] = [
     {
       accessorKey: "name",
@@ -42,8 +40,11 @@ export function ProductTable({
       id: "actions",
       cell: ({ row }) => (
         <div className="flex items-center place-self-end  w-fit gap-2">
-          <UpdateButton info={row.original} />
-          <DeleteButton productId={row.original.id} />
+          <UpdateProductDialog info={row.original} />
+          <DeleteProductDialog
+            id={row.original.id}
+            productName={row.original.name}
+          />
         </div>
       ),
     },
@@ -76,54 +77,5 @@ function EmptyProduct() {
         </Link>
       </EmptyContent>
     </Empty>
-  );
-}
-
-function UpdateButton({ info }: { info: ProductType }) {
-  const [open, setOpen] = useState(false);
-  const router = useRouter();
-  return (
-    <div>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger
-          render={
-            <Button variant={"secondary"}>
-              <PenIcon />
-            </Button>
-          }
-        />
-        <DialogContent>
-          <ProductForm
-            type="update"
-            existedValues={info}
-            onSuccess={() => {
-              router.refresh();
-              setOpen(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-function DeleteButton({ productId }: { productId: string }) {
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
-  return (
-    <div>
-      <Button
-        disabled={isPending}
-        onClick={() => {
-          startTransition(async () => {
-            const res = await deleteProduct({ productId });
-            showToast(res);
-            router.refresh();
-          });
-        }}
-        variant={"destructive"}
-      >
-        <TrashIcon />
-      </Button>
-    </div>
   );
 }

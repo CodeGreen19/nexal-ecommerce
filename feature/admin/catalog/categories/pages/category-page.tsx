@@ -4,6 +4,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { CategoriesListing } from "../components/categories-listing";
 import { CategoryHeader } from "../components/category-header";
 import { getCategories } from "../queries";
+import { DefaultErrorComp } from "@/components/shared/default-error-comp";
 
 export function CategoriesPage() {
   return (
@@ -18,7 +19,7 @@ export function Categories() {
   const categories = getCategories();
   return (
     <div>
-      <ErrorBoundary fallback={<div>Error</div>}>
+      <ErrorBoundary fallback={<DefaultErrorComp />}>
         <Suspense fallback={<DataTableSkeleton column={2} />}>
           <CategoriesListing categories={categories} />
         </Suspense>

@@ -4,6 +4,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ProductsHeader } from "../components/products-header";
 import { ProductTable } from "../components/products-table";
 import { getProducts } from "../queries";
+import { DefaultErrorComp } from "@/components/shared/default-error-comp";
 
 export function ProductsPage() {
   return (
@@ -18,7 +19,7 @@ export function Products() {
   const products = getProducts();
   return (
     <div>
-      <ErrorBoundary fallback={<div>Error</div>}>
+      <ErrorBoundary fallback={<DefaultErrorComp />}>
         <Suspense fallback={<DataTableSkeleton column={2} />}>
           <ProductTable products={products} />
         </Suspense>

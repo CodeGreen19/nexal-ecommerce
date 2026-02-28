@@ -8,5 +8,7 @@ import { cacheLife, cacheTag } from "next/cache";
 export async function getCategories() {
   cacheTag("categories");
   cacheLife("max");
+  console.log("category-triggered");
+
   return await db.select().from(categories).orderBy(asc(categories.createdAt));
 }

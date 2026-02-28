@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { categorySchema, CategorySchemaType } from "../schemas";
 import { CategoryType } from "../types";
 import { addCategory, updateCategory } from "../actions";
+import { useMutation } from "@tanstack/react-query";
 
 export function CategoryForm({
   type,
@@ -31,6 +32,18 @@ export function CategoryForm({
   const defaultValues: CategorySchemaType = existedValues || {
     name: "",
   };
+
+  const addMutation = useMutation({
+    mutationFn: addCategory,
+    onSuccess: (res) => {
+      showToast(res);
+      if (res.success) {
+        form.reset();
+        onSuccess && onSuccess();
+      }
+    },
+  });
+
   const form = useAppForm({
     defaultValues: defaultValues,
     validators: {
@@ -42,6 +55,7 @@ export function CategoryForm({
         showToast(res);
         if (res.success) {
           form.reset();
+          onSuccess && onSuccess();
         }
       }
 
@@ -57,7 +71,7 @@ export function CategoryForm({
   });
 
   return (
-    <Card className="w-full rounded-sm border-none shadow-none">
+    <Card className="w-full rounded-sm ring-0 shadow-none">
       <CardHeader>
         <CardTitle>Category info</CardTitle>
         <CardDescription>

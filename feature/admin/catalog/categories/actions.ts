@@ -21,6 +21,17 @@ export async function addCategory({
   if (!success) {
     return customError("Invalid data !");
   }
+
+  const [categoryNameExists] = await db
+    .select()
+    .from(categories)
+    .where(eq(categories.name, data.name));
+  console.log(categoryNameExists, "exist");
+
+  if (categoryNameExists) {
+    return customError("Category name already exists");
+  }
+
   const slug = await generateUniqueSlug(categories.slug, data.name);
   await db.insert(categories).values({ ...data, slug });
   revalidateTag("categories", "max");

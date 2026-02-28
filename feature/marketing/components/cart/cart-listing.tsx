@@ -42,7 +42,7 @@ export function CartListing() {
 
             <p>
               Total Price: {` ${item.quantity} * ${item.product.price} = `}{" "}
-              <Badge>{item.quantity * item.product.price}</Badge>
+              <Badge>{item.quantity * 5}</Badge>
             </p>
 
             <CartListingActions item={item} />

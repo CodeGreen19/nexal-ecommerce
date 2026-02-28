@@ -19,12 +19,7 @@ async function Products() {
   return (
     <div className="grid gap-2 grid-cols-2 md:grid-cols-4 px-4 xl:px-0 mb-5">
       {featureProducts.map((product) => (
-        <HomeProductCard
-          price={product.price}
-          key={product.id}
-          id={product.id}
-          name={product.name}
-        />
+        <HomeProductCard key={product.id} id={product.id} name={product.name} />
       ))}
     </div>
   );

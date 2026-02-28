@@ -11,7 +11,7 @@ export function HomeProductCard({
 }: {
   name: string;
   id: string;
-  price: number;
+  price?: number;
 }) {
   return (
     <Link href={`/products/${id}`}>
