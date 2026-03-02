@@ -6,9 +6,9 @@ export default function AdminDashboardLayout(props: LayoutProps<"/admin">) {
   return (
     <SidebarProvider>
       <AdminSidebar />
-      <main className="w-full">
+      <main className="w-full  bg-muted ">
         <AdminHeader />
-        <div className="px-4">{props.children}</div>
+        <div className="px-4 md:px-10 pb-10">{props.children}</div>
       </main>
     </SidebarProvider>
   );

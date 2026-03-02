@@ -14,7 +14,7 @@ export function SubscribeButton({
     <form.Subscribe
       selector={(state) => [state.isSubmitting]}
       children={([isPending]) => (
-        <Field orientation="horizontal">
+        <Field className="justify-end" orientation="horizontal">
           <Button
             type="button"
             variant="outline"

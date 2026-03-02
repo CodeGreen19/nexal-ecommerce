@@ -1,3 +1,5 @@
+import { InventoryPage } from "@/feature/admin/catalog/inventory/components/inventory-page";
+
 export default function page() {
-  return <div>Inventory page</div>;
+  return <InventoryPage />;
 }

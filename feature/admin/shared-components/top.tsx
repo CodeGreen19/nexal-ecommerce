@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ArrowLeftIcon, CaretLeftIcon } from "@phosphor-icons/react";
+import { CaretLeftIcon } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -13,7 +13,12 @@ function Top({
   className?: string;
 }) {
   return (
-    <div className={cn("flex items-center justify-between", className)}>
+    <div
+      className={cn(
+        "flex items-center justify-between h-14 sticky top-16 bg-muted ",
+        className,
+      )}
+    >
       {children}
     </div>
   );
@@ -56,4 +61,4 @@ function TopActions({
   );
 }
 
-export { Top, TopTitle, TopActions };
+export { Top, TopActions, TopTitle };

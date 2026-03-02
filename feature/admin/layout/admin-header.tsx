@@ -5,28 +5,28 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { usePathname } from "next/navigation";
+import { Fragment } from "react";
+import { getBreadcrumbArr } from "./helpers";
 export function AdminHeader() {
+  const pathname = usePathname();
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2  px-4 w-full">
+    <header className="flex h-16 shrink-0 sticky top-0 bg-muted backdrop-blur-lg  border-border items-center gap-2  px-4 w-full">
       <SidebarTrigger className="-ml-1" />
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/components">Components</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-          </BreadcrumbItem>
+          {getBreadcrumbArr(pathname).map((item, i) => (
+            <Fragment key={item}>
+              {i !== 0 && <BreadcrumbSeparator />}
+              <BreadcrumbItem key={item}>
+                <BreadcrumbPage>{item}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </Fragment>
+          ))}
         </BreadcrumbList>
       </Breadcrumb>
     </header>

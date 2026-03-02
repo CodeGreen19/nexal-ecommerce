@@ -20,7 +20,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
   return (
     <Sidebar>
-      <SidebarHeader className="pl-4 h-16 flex items-start justify-start">
+      <SidebarHeader className="pl-4 h-16  flex items-start justify-center">
         <Logo href="/admin/home/dashboard" />
       </SidebarHeader>
       <SidebarContent>
@@ -34,8 +34,11 @@ export function AdminSidebar() {
                     <SidebarMenuButton
                       className={cn(
                         "hover:bg-muted hover:text-foreground active:bg-muted active:text-foreground",
-                        pathname === item.href &&
-                          "bg-muted text-primary hover:text-primary active:text-primary",
+                        pathname === item.href ||
+                          (item.subItems?.some(
+                            (subItem) => subItem.href === pathname,
+                          ) &&
+                            "bg-muted text-primary hover:text-primary active:text-primary"),
                       )}
                       render={
                         <Link href={item.href}>

@@ -1,5 +1,4 @@
 import {
-  ControlIcon,
   GameControllerIcon,
   HouseIcon,
   Icon,
@@ -11,7 +10,12 @@ import {
 
 export type NavItemType = {
   label: string;
-  items: { title: string; icon: Icon; href: string }[];
+  items: {
+    title: string;
+    icon: Icon;
+    href: string;
+    subItems?: { title: string; href: string }[];
+  }[];
 };
 export const navItems: NavItemType[] = [
   {
@@ -27,6 +31,7 @@ export const navItems: NavItemType[] = [
         title: "Products",
         href: "/admin/catalog/products",
         icon: ListBulletsIcon,
+        subItems: [{ title: "New ", href: "/admin/catalog/products/add-new" }],
       },
       {
         title: "Inventory",
