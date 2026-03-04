@@ -1,53 +1,43 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldGroup } from "@/components/ui/field";
 
 import { useAppForm } from "@/components/form/form-context";
-import { showToast } from "@/helpers/ui/show-toast";
-import { useRouter } from "next/navigation";
-import { addProduct, updateProduct } from "../actions";
-import { productSchema, ProductSchemaType } from "../schemas";
-import { ProductType } from "../types";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { ProductImages } from "./product-images";
-import { SelectCategories } from "./select-categories";
-import { ProductCoupon } from "./product-coupon";
 import {
   Top,
   TopActions,
   TopTitle,
 } from "@/feature/admin/shared-components/top";
+import { showToast } from "@/helpers/ui/show-toast";
+import { addProduct, updateProduct } from "../actions";
+import { productSchema, ProductSchemaType } from "../schemas";
+import { ProductType } from "../types";
+import { ProductCoupon } from "./product-coupon";
+import { ProductImages } from "./product-images";
+import { ProductOptionsDialog } from "./product-options";
+import { SelectCategories } from "./select-categories";
 
 export function ProductForm({
   type,
   existedValues,
   onSuccess,
+  backToUrl,
 }: {
   type: "add" | "update";
-  existedValues?: Pick<ProductType, "id" | "name" | "description">;
+  existedValues?: ProductSchemaType & { productId: string };
   onSuccess?: () => void;
+  backToUrl?: string;
 }) {
-  const defaultValues: ProductSchemaType = {
+  const defaultValues: ProductSchemaType = existedValues ?? {
     name: "",
     description: "",
+    sku: "",
     price: 0,
     costOfGoods: 0,
     stock: 0,
-    shippingWeightInKg: 4.3,
+    shippingWeightInKg: 0,
   };
   const form = useAppForm({
     defaultValues: defaultValues,
@@ -58,19 +48,23 @@ export function ProductForm({
     onSubmit: async ({ value }) => {
       console.log(value);
 
-      // if (type === "add") {
-      //   const res = await addProduct({ value });
-      //   showToast(res);
-      //   if (res.success) {
-      //     form.reset();
-      //   }
-      // }
+      if (type === "add") {
+        const res = await addProduct({ value });
+        showToast(res);
+        if (res.success) {
+          form.reset();
+        }
+        onSuccess && onSuccess();
+      }
 
-      // if (type === "update" && existedValues) {
-      //   const res = await updateProduct({ value, productId: existedValues.id });
-      //   showToast(res);
-      //   onSuccess && onSuccess();
-      // }
+      if (type === "update" && existedValues) {
+        const res = await updateProduct({
+          value,
+          productId: existedValues.productId,
+        });
+        showToast(res);
+        onSuccess && onSuccess();
+      }
     },
   });
 
@@ -83,7 +77,9 @@ export function ProductForm({
       }}
     >
       <Top>
-        <TopTitle backToUrl="/admin/catalog/products">Add new product</TopTitle>
+        <TopTitle backToUrl={backToUrl || "/admin/catalog/products"}>
+          {type === "add" ? "Add new" : "Update"} product
+        </TopTitle>
         <TopActions>
           <form.AppForm>
             <form.SubscribeButton formId={`product-form-${type}`} type={type} />
@@ -159,10 +155,18 @@ export function ProductForm({
             </CardHeader>
             <CardContent>
               <FieldGroup>
-                <FieldGroup className="flex-row items-start">
+                <FieldGroup>
                   <form.AppField
                     name="stock"
                     children={(field) => <field.NumberField label="Stock" />}
+                  />
+                </FieldGroup>
+                <FieldGroup className="flex-row items-start">
+                  <form.AppField
+                    name="sku"
+                    children={(field) => (
+                      <field.TextField label="SKU (stock keeping unit)" />
+                    )}
                   />
                   <form.AppField
                     name="shippingWeightInKg"
@@ -185,7 +189,7 @@ export function ProductForm({
                     Does your product come in different options, like size,
                     color or material? Add them here.
                   </p>
-                  <Button variant={"secondary"}>Add Variants</Button>
+                  <ProductOptionsDialog />
                 </Field>
               </FieldGroup>
             </CardContent>

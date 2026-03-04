@@ -11,13 +11,13 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { CloudWarningIcon } from "@phosphor-icons/react";
+import { CloudWarningIcon, PenIcon } from "@phosphor-icons/react";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { use } from "react";
 import { ProductType } from "../types";
 import { DeleteProductDialog } from "./delete-product-dialog";
-import { UpdateProductDialog } from "./update-product-dialog";
+import { useRouter } from "next/navigation";
 
 export function ProductTable({
   products,
@@ -25,6 +25,7 @@ export function ProductTable({
   products: Promise<ProductType[]>;
 }) {
   const allProducts = use(products);
+  const router = useRouter();
 
   const columns: ColumnDef<ProductType>[] = [
     {
@@ -32,15 +33,28 @@ export function ProductTable({
       header: "Name",
     },
     {
-      accessorKey: "description",
-      header: "Descriptions",
+      header: "Price",
+      cell: ({ row }) => <div>{row.original.variants[0].price}</div>,
+    },
+    {
+      header: "Inventory",
+      cell: ({ row }) => (
+        <div>{row.original.variants[0].inventory?.quantity}</div>
+      ),
     },
 
     {
       id: "actions",
       cell: ({ row }) => (
         <div className="flex items-center place-self-end  w-fit gap-2">
-          <UpdateProductDialog info={row.original} />
+          <Button
+            variant={"secondary"}
+            onClick={() =>
+              router.push(`/admin/catalog/products/${row.original.id}/edit`)
+            }
+          >
+            <PenIcon />
+          </Button>
           <DeleteProductDialog
             id={row.original.id}
             productName={row.original.name}

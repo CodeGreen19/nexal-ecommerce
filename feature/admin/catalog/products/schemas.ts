@@ -19,6 +19,7 @@ export const productSchema = z.object({
     .int("Value must be a whole number")
     .nonnegative("Stock can't be negetive"),
   shippingWeightInKg: z.number().nonnegative("Weight must be greater that 0"),
+  sku: z.string().min(10, "SKU must be at lest 10 char"),
 });
 
 export type ProductSchemaType = z.infer<typeof productSchema>;

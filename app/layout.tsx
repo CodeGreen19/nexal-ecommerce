@@ -38,7 +38,7 @@ export default function RootLayout({
         <Toaster
           closeButton
           toastOptions={{
-            style: { boxShadow: "none", backgroundColor: "var(--secondary)" },
+            style: { boxShadow: "none", backgroundColor: "var(--background)" },
           }}
         />
       </body>

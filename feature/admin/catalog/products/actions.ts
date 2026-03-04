@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/drizzle/db";
-import { products } from "@/drizzle/schema";
+import { productInventory, products, productVariants } from "@/drizzle/schema";
 import {
   customError,
   customSuccess,
@@ -22,7 +22,25 @@ export async function addProduct({
     return customError();
   }
   const slug = await generateUniqueSlug(products.slug, data.name);
-  await db.insert(products).values({ ...data, slug });
+  const [res] = await db
+    .insert(products)
+    .values({ ...data, slug })
+    .returning({ productId: products.id });
+
+  //add variants
+
+  const [variantData] = await db
+    .insert(productVariants)
+    .values({
+      ...data,
+      productId: res.productId,
+    })
+    .returning({ variantId: productVariants.id });
+  //add inventory
+  await db
+    .insert(productInventory)
+    .values({ variantId: variantData.variantId, quantity: data.stock });
+
   revalidateTag("products", "max");
   return customSuccess();
 }
@@ -55,11 +73,28 @@ export async function updateProduct({
     const newSlug = await generateUniqueSlug(products.slug, data.name);
     slug = newSlug;
   }
-
+  // update product
   await db
     .update(products)
     .set({ ...data, slug })
-    .where(eq(products.id, productId));
+    .where(eq(products.id, productId))
+    .returning();
+
+  // update varient
+  const [variantData] = await db
+    .update(productVariants)
+    .set({
+      ...data,
+    })
+    .where(eq(productVariants.productId, productId))
+    .returning({ variantId: productVariants.id });
+
+  //update inventory
+  await db
+    .update(productInventory)
+    .set({ quantity: data.stock })
+    .where(eq(productInventory.variantId, variantData.variantId));
+
   revalidateTag("products", "max");
   return customSuccess("Product Updated");
 }

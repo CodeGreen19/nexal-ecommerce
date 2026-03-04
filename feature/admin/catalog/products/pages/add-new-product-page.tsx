@@ -1,5 +1,14 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { ProductForm } from "../components/product-form";
 
 export function AddNewProductPage() {
-  return <ProductForm type="add" />;
+  const router = useRouter();
+  return (
+    <ProductForm
+      type="add"
+      onSuccess={() => router.push("/admin/catalog/products")}
+    />
+  );
 }

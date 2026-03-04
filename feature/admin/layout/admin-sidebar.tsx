@@ -34,11 +34,13 @@ export function AdminSidebar() {
                     <SidebarMenuButton
                       className={cn(
                         "hover:bg-muted hover:text-foreground active:bg-muted active:text-foreground",
+
                         pathname === item.href ||
-                          (item.subItems?.some(
+                          item.subItems?.some(
                             (subItem) => subItem.href === pathname,
-                          ) &&
-                            "bg-muted text-primary hover:text-primary active:text-primary"),
+                          )
+                          ? "bg-muted text-primary hover:text-primary active:text-primary"
+                          : "",
                       )}
                       render={
                         <Link href={item.href}>
