@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getSession } from "@/lib/dal";
-import { Suspense } from "react";
+import { Suspense, Fragment } from "react";
+import ProfileAddress from "../components/account/profile/profile-address";
 
 export async function AccountProfilePage() {
   return (
@@ -15,15 +16,18 @@ async function AccountProfile() {
   const res = await getSession();
 
   return (
-    <Card className="mx-4 xl:mx-0">
-      <CardHeader>
-        <CardTitle>Profile info</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div>name: {res.user.name}</div>
-        <div>email: {res.user.email}</div>
-      </CardContent>
-    </Card>
+    <Fragment>
+      <Card className="mx-4 xl:mx-0">
+        <CardHeader>
+          <CardTitle>Profile info</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div>name: {res.user.name}</div>
+          <div>email: {res.user.email}</div>
+        </CardContent>
+      </Card>
+      <ProfileAddress />
+    </Fragment>
   );
 }
 

@@ -19,7 +19,7 @@ export function ProductDetailInfo({
   return (
     <div className=" px-4 py-4 lg:py-0 lg:px-5 space-y-5">
       <h1 className="text-2xl font-bold">{product.name}</h1>
-      <h2 className="text-3xl font-black">{5} $</h2>
+      <h2 className="text-3xl font-black">{product.variants[0].price} $</h2>
       <QuantityPicker count={count} setCount={setCount} />
       <div className="flex gap-2">
         <Button
@@ -27,8 +27,7 @@ export function ProductDetailInfo({
           onClick={() => {
             startTransition(async () => {
               await addToCart({
-                price: 5,
-                productId: product.id,
+                productVariantId: product.variants[0].id,
                 quantity: count,
               });
               await qc.invalidateQueries({ queryKey: ["cart"] });

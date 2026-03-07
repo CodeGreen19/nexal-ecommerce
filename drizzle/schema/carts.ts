@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import { integer, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { createdAt, id, updatedAt } from "../helpers";
+import { productVariants } from "./products";
 
 export const carts = pgTable("carts", {
   id,
@@ -13,11 +14,12 @@ export const carts = pgTable("carts", {
 export const cartItems = pgTable("cart_items", {
   id,
   cartId: uuid("cart_id")
-    .references(() => carts.id, { onDelete: "cascade" })
-    .notNull(),
-  productId: uuid("product_id").notNull(),
+    .notNull()
+    .references(() => carts.id, { onDelete: "cascade" }),
+  productVariantId: uuid("product_variant_id")
+    .notNull()
+    .references(() => productVariants.id, { onDelete: "cascade" }),
   quantity: integer("quantity").notNull(),
-  priceSnapshot: integer("price_snapshot").notNull(), // optional
   createdAt,
 });
 
@@ -28,5 +30,9 @@ export const cartItemsRelations = relations(cartItems, ({ one }) => ({
   carts: one(carts, {
     fields: [cartItems.cartId],
     references: [carts.id],
+  }),
+  productVariant: one(productVariants, {
+    fields: [cartItems.productVariantId],
+    references: [productVariants.id],
   }),
 }));

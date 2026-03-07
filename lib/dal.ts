@@ -12,5 +12,9 @@ export async function getSession() {
 }
 export async function getUserId() {
   const res = await auth.api.getSession({ headers: await headers() });
-  return res?.user.id;
+
+  if (!res?.user) {
+    throw new Error("User not found");
+  }
+  return res.user.id;
 }

@@ -50,7 +50,7 @@ export function ProductTable({
           <Button
             variant={"secondary"}
             onClick={() =>
-              router.push(`/admin/catalog/products/${row.original.id}/edit`)
+              router.push(`/admin/catalog/products/${row.original.id}/update`)
             }
           >
             <PenIcon />

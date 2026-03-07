@@ -28,7 +28,9 @@ export function CartSheet({ children }: { children: ReactNode }) {
     <Sheet open={isOpen} onOpenChange={(open) => setIsOpen(open ? true : null)}>
       <SheetTrigger className={"relative"}>
         {children}{" "}
-        <span className="absolute -top-4 right-1">{data?.items.length}</span>
+        <span className="absolute -top-4 right-1">
+          {data?.items.cartItems.length}
+        </span>
       </SheetTrigger>
       <SheetContent className={"sm:rounded-l-2xl  data-[side=right]:w-full "}>
         <CartSheetHeader />
@@ -43,7 +45,8 @@ function CartSheetHeader() {
   return (
     <SheetHeader>
       <SheetTitle className={"flex justify-between"}>
-        <span>Carts</span> <span>{isRefetching ? <Spinner /> : null}</span>
+        <span>Carts</span>
+        {/* <span>{isRefetching ? <Spinner /> : null}</span> */}
       </SheetTitle>
     </SheetHeader>
   );

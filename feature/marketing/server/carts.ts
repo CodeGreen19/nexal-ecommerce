@@ -1,19 +1,18 @@
 "use server";
 
 import { db } from "@/drizzle/db";
-import { cartItems, carts, products } from "@/drizzle/schema";
+import { cartItems, carts } from "@/drizzle/schema";
 import { getUserId } from "@/lib/dal";
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 type AddToCartType = {
-  productId: string;
-  price: 5;
+  productVariantId: string;
   quantity: number;
 };
-export async function addToCart({ productId, quantity, price }: AddToCartType) {
+export async function addToCart({ productVariantId, quantity }: AddToCartType) {
   const userId = await getUserId();
   const cart = await getOrCreateCart(userId);
-  const existingItem = await findCartItem(cart.id, productId);
+  const existingItem = await findCartItem(cart.id, productVariantId);
 
   if (existingItem) {
     await db
@@ -27,8 +26,7 @@ export async function addToCart({ productId, quantity, price }: AddToCartType) {
 
   await db.insert(cartItems).values({
     cartId: cart.id,
-    productId,
-    priceSnapshot: price,
+    productVariantId,
     quantity,
   });
 }
@@ -79,29 +77,20 @@ export async function getCart() {
   if (!cart) return null;
 
   // Manual Join because relations aren't defined
-  const itemsWithProducts = await db
-    .select({
-      // Select Cart Item fields
-      id: cartItems.id,
-      quantity: cartItems.quantity,
-      priceSnapshot: cartItems.priceSnapshot,
-      createdAt: cartItems.createdAt,
-      // Select specific Product fields (Minimal data)
-      product: {
-        id: products.id,
-        name: products.name,
-        price: products.name,
+  const itemsWithProductVariant = await db.query.carts.findFirst({
+    where: eq(carts.id, cart.id),
+    with: {
+      cartItems: {
+        with: {
+          productVariant: { with: { product: { columns: { name: true } } } },
+        },
       },
-    })
-    .from(cartItems)
-    .innerJoin(products, eq(cartItems.productId, products.id)) // The link
-    .where(eq(cartItems.cartId, cart.id))
-    .orderBy(desc(cartItems.createdAt));
-
-  return {
-    ...cart,
-    items: itemsWithProducts,
-  };
+    },
+  });
+  if (!itemsWithProductVariant) {
+    return null;
+  }
+  return { items: itemsWithProductVariant };
 }
 //========================== services =======================================//
 
@@ -129,11 +118,11 @@ async function createCart(userId?: string) {
   return cart;
 }
 
-async function findCartItem(cartId: string, productId: string) {
+async function findCartItem(cartId: string, productVariantId: string) {
   return db.query.cartItems.findFirst({
     where: and(
       eq(cartItems.cartId, cartId),
-      eq(cartItems.productId, productId),
+      eq(cartItems.productVariantId, productVariantId),
     ),
   });
 }

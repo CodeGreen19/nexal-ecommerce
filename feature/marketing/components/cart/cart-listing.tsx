@@ -27,22 +27,27 @@ export function CartListing() {
     return <div className="px-4">Failed to load cart</div>;
   }
 
-  if (!data || !data.items?.length) {
+  if (!data || !data.items.cartItems.length) {
     return <div className="px-4">Your cart is empty</div>;
   }
 
+  const totalPrice = data.items.cartItems.reduce(
+    (prev, curr) => prev + curr.productVariant.price * curr.quantity,
+    0,
+  );
   return (
     <Fragment>
       <div className="px-4 space-y-4 max-h-[75vh] overflow-y-auto">
-        {data.items.map((item) => (
+        {data.items.cartItems.map((item) => (
           <div key={item.id} className="border p-4 w-full rounded-lg space-y-2">
-            <p>Name: {item.product.name}</p>
-            <p>Price: {item.product.price}</p>
+            <p>Name: {item.productVariant.product.name}</p>
+            <p>Price: {item.productVariant.price}</p>
             <p>Quantity: {item.quantity}</p>
 
             <p>
-              Total Price: {` ${item.quantity} * ${item.product.price} = `}{" "}
-              <Badge>{item.quantity * 5}</Badge>
+              Total Price:{" "}
+              {` ${item.quantity} * ${item.productVariant.price} = `}{" "}
+              <Badge>{item.quantity * item.productVariant.price}</Badge>
             </p>
 
             <CartListingActions item={item} />
@@ -51,13 +56,7 @@ export function CartListing() {
       </div>
 
       <SheetFooter className="flex-row justify-between">
-        <h1 className="text-xl font-black">
-          {data.items.reduce(
-            (prev, current) => prev + current.quantity * current.priceSnapshot,
-            0,
-          )}{" "}
-          $
-        </h1>
+        <h1 className="text-xl font-black">{totalPrice} $</h1>
         <Button>
           Procced <CaretRightIcon />
         </Button>
@@ -69,7 +68,9 @@ export function CartListing() {
 function CartListingActions({
   item,
 }: {
-  item: NonNullable<Awaited<ReturnType<typeof getCart>>>["items"][number];
+  item: NonNullable<
+    Awaited<ReturnType<typeof getCart>>
+  >["items"]["cartItems"][number];
 }) {
   const qc = useQueryClient();
   const increase = useMutation({
