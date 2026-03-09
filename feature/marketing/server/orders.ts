@@ -95,7 +95,8 @@ export async function createOrder({
     }
     await db
       .update(productInventory)
-      .set({ quantity: res.quantity - item.quantity });
+      .set({ quantity: res.quantity - item.quantity })
+      .where(eq(productInventory.id, res.id));
   }
 
   // clean ups
