@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={roboto.variable}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
       >
         <TanStackQueryProvider>
           <NuqsAdapter>{children}</NuqsAdapter>
@@ -41,6 +41,7 @@ export default function RootLayout({
             style: { boxShadow: "none", backgroundColor: "var(--background)" },
           }}
         />
+        <div id="ml-container" />
       </body>
     </html>
   );

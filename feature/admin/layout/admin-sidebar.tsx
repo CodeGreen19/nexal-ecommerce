@@ -19,7 +19,7 @@ import { navItems } from "./constants";
 export function AdminSidebar() {
   const pathname = usePathname();
   return (
-    <Sidebar className="-z-10">
+    <Sidebar className="z-100">
       <SidebarHeader className="pl-4 h-16  flex items-start justify-center">
         <Logo href="/admin/home/dashboard" />
       </SidebarHeader>

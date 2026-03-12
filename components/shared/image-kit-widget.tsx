@@ -5,6 +5,7 @@ import {
 } from "imagekit-media-library-widget";
 import { Button } from "../ui/button";
 import { ReactNode, useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 
 export type InsertType = {
   eventType: "INSERT";
@@ -19,9 +20,11 @@ export type InsertType = {
 export default function ImageKitWidgetButtonWrapper({
   children,
   onInsert,
+  className,
 }: {
   children: ReactNode;
   onInsert?: (data: InsertType) => void;
+  className?: string;
 }) {
   const widgetRef = useRef<ImagekitMediaLibraryWidget | null>(null);
   useEffect(() => {
@@ -33,12 +36,6 @@ export default function ImageKitWidgetButtonWrapper({
         container: "#ml-container",
 
         renderOpenButton: false,
-        view: "modal",
-        mlSettings: {
-          multiple: true,
-          maxFiles: 5,
-          initialView: { fileType: "images" as FileTypeValue },
-        },
       },
 
       insertCallBack,
@@ -48,9 +45,9 @@ export default function ImageKitWidgetButtonWrapper({
   }, []);
 
   return (
-    <div>
-      <div id="ml-container" className="z-100" />
-      <Button
+    <>
+      <div
+        className={cn("z-100", className)}
         onClick={() => {
           if (widgetRef.current) {
             widgetRef.current.open();
@@ -58,7 +55,7 @@ export default function ImageKitWidgetButtonWrapper({
         }}
       >
         {children}
-      </Button>
-    </div>
+      </div>
+    </>
   );
 }

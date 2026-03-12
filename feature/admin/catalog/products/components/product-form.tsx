@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldGroup } from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 
 import { useAppForm } from "@/components/form/form-context";
 import { Button } from "@/components/ui/button";
@@ -12,12 +12,17 @@ import {
 } from "@/feature/admin/shared-components/top";
 import { showToast } from "@/helpers/ui/show-toast";
 import { addProduct, updateProduct } from "../actions";
-import { productSchema, ProductSchemaType } from "../schemas";
-import { ProductType } from "../types";
+import {
+  emptydefaultValues,
+  productSchema,
+  ProductSchemaType,
+} from "../schemas";
 import { ProductCoupon } from "./product-coupon";
 import { ProductImages } from "./product-images";
-import { ProductOptionsDialog } from "./product-options";
+import { ChildFormForProductOptions } from "./product-options";
 import { SelectCategories } from "./select-categories";
+import { Input } from "@/components/ui/input";
+import { useStore } from "@tanstack/react-form";
 
 export function ProductForm({
   type,
@@ -30,43 +35,36 @@ export function ProductForm({
   onSuccess?: () => void;
   backToUrl?: string;
 }) {
-  const defaultValues: ProductSchemaType = existedValues ?? {
-    name: "",
-    description: "",
-    sku: "",
-    price: 0,
-    costOfGoods: 0,
-    stock: 0,
-    shippingWeightInKg: 0,
-  };
+  const defaultValues: ProductSchemaType = existedValues ?? emptydefaultValues;
+
   const form = useAppForm({
-    defaultValues: defaultValues,
+    defaultValues,
     validators: {
       onSubmit: productSchema,
-      onChange: productSchema,
     },
     onSubmit: async ({ value }) => {
       console.log(value);
+      // if (type === "add") {
+      //   const res = await addProduct({ value });
+      //   showToast(res);
+      //   if (res.success) {
+      //     form.reset();
+      //   }
+      //   onSuccess && onSuccess();
+      // }
 
-      if (type === "add") {
-        const res = await addProduct({ value });
-        showToast(res);
-        if (res.success) {
-          form.reset();
-        }
-        onSuccess && onSuccess();
-      }
-
-      if (type === "update" && existedValues) {
-        const res = await updateProduct({
-          value,
-          productId: existedValues.productId,
-        });
-        showToast(res);
-        onSuccess && onSuccess();
-      }
+      // if (type === "update" && existedValues) {
+      //   const res = await updateProduct({
+      //     value,
+      //     productId: existedValues.productId,
+      //   });
+      //   showToast(res);
+      //   onSuccess && onSuccess();
+      // }
     },
   });
+
+  const formStore = useStore(form.store, (store) => store.values);
 
   return (
     <form
@@ -92,11 +90,25 @@ export function ProductForm({
             <CardHeader>
               <CardTitle>Images</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="py-2">
               <FieldGroup>
-                <Field>
-                  <ProductImages />
-                </Field>
+                <form.Field
+                  name="images"
+                  children={(field) => (
+                    <Field>
+                      <ProductImages
+                        onInsert={(v) => form.setFieldValue("images", v)}
+                        onDelete={(fileId) => {
+                          const updatedInserts = field.state.value.filter(
+                            (prev) => prev.fileId !== fileId,
+                          );
+                          form.setFieldValue("images", updatedInserts);
+                        }}
+                        inserts={field.state.value}
+                      />
+                    </Field>
+                  )}
+                />
               </FieldGroup>
             </CardContent>
           </Card>
@@ -133,19 +145,49 @@ export function ProductForm({
               <CardTitle>Pricing</CardTitle>
             </CardHeader>
             <CardContent>
+              <FieldGroup className="flex-none grid grid-cols-2">
+                <form.AppField
+                  name="price"
+                  children={(field) => <field.NumberField label="Price" />}
+                />
+                <form.AppField
+                  name="costOfGoods"
+                  children={(field) => (
+                    <field.NumberField label="Costs of goods" />
+                  )}
+                />
+                <Field>
+                  <FieldLabel>Profit</FieldLabel>
+                  <Input
+                    disabled
+                    value={formStore.price - (formStore.costOfGoods || 0)}
+                    className="disabled:opacity-90"
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Margin (in percent)</FieldLabel>
+                  <Input
+                    disabled
+                    className="disabled:opacity-90"
+                    value={`${(((formStore.price - (formStore.costOfGoods || 0)) / formStore.price) * 100 || 0).toFixed(0)} %`}
+                  />
+                </Field>
+              </FieldGroup>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Product Options</CardTitle>
+            </CardHeader>
+            <CardContent>
               <FieldGroup>
-                <FieldGroup className="flex-row items-start">
-                  <form.AppField
-                    name="price"
-                    children={(field) => <field.NumberField label="Price" />}
-                  />
-                  <form.AppField
-                    name="costOfGoods"
-                    children={(field) => (
-                      <field.NumberField label="Costs of goods" />
-                    )}
-                  />
-                </FieldGroup>
+                <Field orientation={"horizontal"}>
+                  {/* <p>
+                    Does your product come in different options, like size,
+                    color or material? Add them here.
+                  </p> */}
+                  <ChildFormForProductOptions form={form} />
+                </Field>
               </FieldGroup>
             </CardContent>
           </Card>
@@ -178,22 +220,7 @@ export function ProductForm({
               </FieldGroup>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Options</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FieldGroup>
-                <Field orientation={"horizontal"}>
-                  <p>
-                    Does your product come in different options, like size,
-                    color or material? Add them here.
-                  </p>
-                  <ProductOptionsDialog />
-                </Field>
-              </FieldGroup>
-            </CardContent>
-          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Product Options</CardTitle>

@@ -7,7 +7,7 @@ import { NumberField } from "./number-field";
 export const { fieldContext, formContext, useFieldContext, useFormContext } =
   createFormHookContexts();
 
-export const { useAppForm } = createFormHook({
+export const { useAppForm, withForm } = createFormHook({
   fieldContext,
   formContext,
   fieldComponents: {

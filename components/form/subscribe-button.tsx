@@ -5,8 +5,10 @@ import { useFormContext } from "./form-context";
 export function SubscribeButton({
   type,
   formId,
+  buttonText,
 }: {
-  type: "add" | "update";
+  type: "add" | "update" | "general";
+  buttonText?: string;
   formId: string;
 }) {
   const form = useFormContext();
@@ -26,7 +28,7 @@ export function SubscribeButton({
             Reset
           </Button>
           <Button disabled={isPending} type="submit" form={formId}>
-            {type === "update" ? "Update" : "Submit"}
+            {buttonText || (type === "update" ? "Update" : "Submit")}
           </Button>
         </Field>
       )}

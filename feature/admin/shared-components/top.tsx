@@ -15,7 +15,7 @@ function Top({
   return (
     <div
       className={cn(
-        "flex items-center justify-between h-14 sticky top-16 bg-muted ",
+        "flex items-center justify-between h-14 sticky top-16 bg-muted z-20",
         className,
       )}
     >

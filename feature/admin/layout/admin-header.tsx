@@ -15,7 +15,7 @@ import { getBreadcrumbArr } from "./helpers";
 export function AdminHeader() {
   const pathname = usePathname();
   return (
-    <header className="flex h-16 shrink-0 sticky top-0 bg-muted backdrop-blur-lg  border-border items-center gap-2  px-4 w-full">
+    <header className="flex h-16 shrink-0 sticky top-0 bg-muted backdrop-blur-lg  border-border items-center gap-2  px-4 w-full z-20">
       <SidebarTrigger className="-ml-1" />
       <Breadcrumb>
         <BreadcrumbList>

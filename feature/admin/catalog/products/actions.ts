@@ -1,7 +1,12 @@
 "use server";
 
 import { db } from "@/drizzle/db";
-import { productInventory, products, productVariants } from "@/drizzle/schema";
+import {
+  productImages,
+  productInventory,
+  products,
+  productVariants,
+} from "@/drizzle/schema";
 import {
   customError,
   customSuccess,
@@ -26,6 +31,13 @@ export async function addProduct({
     .insert(products)
     .values({ ...data, slug })
     .returning({ productId: products.id });
+
+  // add images
+  if (data.images.length) {
+    await db
+      .insert(productImages)
+      .values(data.images.map((img) => ({ ...img, productId: res.productId })));
+  }
 
   //add variants
 
@@ -80,7 +92,7 @@ export async function updateProduct({
     .where(eq(products.id, productId))
     .returning();
 
-  // update varient
+  // update varient (todo: update for multiple varients)
   const [variantData] = await db
     .update(productVariants)
     .set({
@@ -89,7 +101,7 @@ export async function updateProduct({
     .where(eq(productVariants.productId, productId))
     .returning({ variantId: productVariants.id });
 
-  //update inventory
+  //update inventory (todo:update for multiple inventory)
   await db
     .update(productInventory)
     .set({ quantity: data.stock })
